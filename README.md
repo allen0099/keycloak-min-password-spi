@@ -8,6 +8,7 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
 -   **Configurable Units**: Supports Seconds, Minutes, Hours, and Days.
 -   **Admin Bypass**: Administrators resetting user passwords via the Admin Console are **not** restricted by this policy.
 -   **Temporary Password Bypass**: Users forced to update their password (e.g., first login with a temporary password) are **not** restricted.
+-   **Robust Parsing**: Handles whitespace and case-insensitivity. Invalid configurations are safely ignored (policy disabled) with a warning log.
 
 ## Installation
 
@@ -36,6 +37,11 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
     -   **Seconds**: Just a number (e.g., `60` for 60 seconds).
     -   **Time Units**: Number followed by unit (e.g., `1:d` for 1 day, `30:m` for 30 minutes, `12:h` for 12 hours).
 6.  Click **Save**.
+
+### Validation Notes
+-   **Invalid Format**: If you enter an invalid format (e.g., `abc`, `10:years`), the policy will be **disabled** for safety, and a warning will be logged in the Keycloak server logs.
+-   **Negative Numbers**: Negative values are treated as `0` (disabled).
+-   **UI Validation**: Please note that the Keycloak Admin UI may not prevent you from saving invalid text. Check the server logs if the policy does not seem to apply.
 
 ## Usage
 

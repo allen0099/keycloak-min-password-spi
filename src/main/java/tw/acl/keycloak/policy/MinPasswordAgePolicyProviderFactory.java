@@ -1,4 +1,4 @@
-package com.example.keycloak.policy;
+package tw.acl.keycloak.policy;
 
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;

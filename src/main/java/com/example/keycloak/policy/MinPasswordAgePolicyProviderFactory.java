@@ -37,7 +37,7 @@ public class MinPasswordAgePolicyProviderFactory implements PasswordPolicyProvid
 
     @Override
     public String getDisplayName() {
-        return "Minimum Password Age (Seconds/Time)";
+        return "Minimum Password Age";
     }
 
     @Override

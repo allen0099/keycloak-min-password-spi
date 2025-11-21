@@ -12,11 +12,9 @@
 
 ## 安裝
 
-1.  **建置 JAR 檔**：
-    ```bash
-    mvn clean package
-    ```
-    這將會產生 `target/keycloak-min-password-age-spi-1.0.0-SNAPSHOT.jar`。
+### 選項 1：下載 Release（推薦）
+
+1.  從 [Releases 頁面](https://github.com/allen0099/keycloak-min-password-spi/releases) 下載最新的 JAR 檔案。
 
 2.  **部署到 Keycloak**：
     -   將 JAR 檔案複製到 Keycloak 安裝目錄下的 `providers/` 資料夾。
@@ -26,6 +24,16 @@
         ```
 
 3.  **重新啟動 Keycloak**。
+
+### 選項 2：從原始碼建置
+
+1.  **建置 JAR 檔**：
+    ```bash
+    mvn clean package
+    ```
+    這將會產生 `target/keycloak-min-password-age-spi-1.0.0-SNAPSHOT.jar`。
+
+2.  請依照上述「部署到 Keycloak」步驟進行。
 
 ## 設定
 
@@ -47,3 +55,14 @@
 
 -   **使用者**：如果使用者試圖在期限到期前更改密碼，他們將會看到一條錯誤訊息，指出他們必須等待多久。
 -   **管理員**：無論此政策如何設定，管理員都可以隨時重設使用者密碼。
+
+## 發布流程
+
+本專案使用 GitHub Actions 自動發布 artifact。
+
+1.  更新 `pom.xml` 中的版本號（例如 `1.0.0`）。
+2.  提交更改。
+3.  建立一個以 `v` 開頭的標籤（例如 `v1.0.0`）。
+4.  將標籤推送到 GitHub。
+
+Workflow 將會自動建置 JAR 檔並建立一個附帶 artifact 的 GitHub Release。

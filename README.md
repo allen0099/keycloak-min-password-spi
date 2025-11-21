@@ -12,11 +12,9 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
 
 ## Installation
 
-1.  **Build the JAR**:
-    ```bash
-    mvn clean package
-    ```
-    This will generate `target/keycloak-min-password-age-spi-1.0.0-SNAPSHOT.jar`.
+### Option 1: Download (Recommended)
+
+1.  Download the latest JAR file from the [Releases Page](https://github.com/allen0099/keycloak-min-password-spi/releases).
 
 2.  **Deploy to Keycloak**:
     -   Copy the JAR file to the `providers/` directory of your Keycloak installation.
@@ -26,6 +24,16 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
         ```
 
 3.  **Restart Keycloak**.
+
+### Option 2: Build from Source
+
+1.  **Build the JAR**:
+    ```bash
+    mvn clean package
+    ```
+    This will generate `target/keycloak-min-password-age-spi-1.0.0-SNAPSHOT.jar`.
+
+2.  Follow the "Deploy to Keycloak" steps above.
 
 ## Configuration
 
@@ -47,3 +55,14 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
 
 -   **User**: If a user tries to change their password before the time limit expires, they will see an error message indicating how much time they must wait.
 -   **Admin**: Admins can always reset user passwords regardless of this policy.
+
+## Release Process
+
+This project uses GitHub Actions to automatically release artifacts.
+
+1.  Update the version in `pom.xml` (e.g., `1.0.0`).
+2.  Commit the change.
+3.  Create a tag starting with `v` (e.g., `v1.0.0`).
+4.  Push the tag to GitHub.
+
+The workflow will automatically build the JAR and create a GitHub Release with the artifact attached.

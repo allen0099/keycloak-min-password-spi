@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  keycloak:
+    build: .
+    image: keycloak-min-password-age
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"

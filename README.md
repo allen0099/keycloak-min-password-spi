@@ -10,6 +10,10 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
 -   **Temporary Password Bypass**: Users forced to update their password (e.g., first login with a temporary password) are **not** restricted.
 -   **Robust Parsing**: Handles whitespace and case-insensitivity. Invalid configurations are safely ignored (policy disabled) with a warning log.
 
+## Compatibility
+
+-   **Keycloak Versions**: Tested on Keycloak 24.0.1 and 26.4.5. Should work with Keycloak 24 - 26.
+
 ## Installation
 
 ### Option 1: Download (Recommended)

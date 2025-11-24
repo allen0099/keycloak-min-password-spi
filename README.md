@@ -19,14 +19,12 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
 ### Option 1: Download (Recommended)
 
 1.  Download the latest JAR file from the [Releases Page](https://github.com/allen0099/keycloak-min-password-spi/releases).
-
 2.  **Deploy to Keycloak**:
     -   Copy the JAR file to the `providers/` directory of your Keycloak installation.
     -   Run the Keycloak build command:
         ```bash
         bin/kc.sh build
         ```
-
 3.  **Restart Keycloak**.
 
 ### Option 2: Build from Source
@@ -36,7 +34,6 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
     mvn clean package
     ```
     This will generate `target/keycloak-min-password-age-spi-1.0.0-SNAPSHOT.jar`.
-
 2.  Follow the "Deploy to Keycloak" steps above.
 
 ## Configuration
@@ -51,9 +48,8 @@ This custom Keycloak SPI (Service Provider Interface) implements a "Minimum Pass
 6.  Click **Save**.
 
 ### Validation Notes
--   **Invalid Format**: If you enter an invalid format (e.g., `abc`, `10:years`), the policy will be **disabled** for safety, and a warning will be logged in the Keycloak server logs.
--   **Negative Numbers**: Negative values are treated as `0` (disabled).
--   **UI Validation**: Please note that the Keycloak Admin UI may not prevent you from saving invalid text. Check the server logs if the policy does not seem to apply.
+-   **UI Validation**: The Keycloak Admin UI will validate the format. If you enter an invalid format (e.g., `abc`, `10:years`), the UI will show an error and prevent you from saving the policy.
+-   **Negative Numbers**: Negative values are not allowed and will also be blocked by the UI.
 
 ## Usage
 

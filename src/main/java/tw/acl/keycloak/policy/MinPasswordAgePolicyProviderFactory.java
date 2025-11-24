@@ -8,7 +8,8 @@ import org.keycloak.policy.PasswordPolicyProviderFactory;
 
 public class MinPasswordAgePolicyProviderFactory implements PasswordPolicyProviderFactory {
 
-    public static final String ID = "minimum-password-age";
+    public static final String ID = "minimumPasswordAge";
+    private static final String DEFAULT_CONFIG_VALUE = "0";
 
     @Override
     public String getId() {
@@ -42,12 +43,12 @@ public class MinPasswordAgePolicyProviderFactory implements PasswordPolicyProvid
 
     @Override
     public String getConfigType() {
-        return "string";
+        return PasswordPolicyProvider.STRING_CONFIG_TYPE;
     }
 
     @Override
     public String getDefaultConfigValue() {
-        return "0";
+        return DEFAULT_CONFIG_VALUE;
     }
 
     @Override

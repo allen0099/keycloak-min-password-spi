@@ -1,5 +1,5 @@
 # Stage 1: Build the SPI JAR using Maven
-FROM maven:3-eclipse-temurin-17 AS builder
+FROM maven:3-eclipse-temurin-25 AS builder
 
 WORKDIR /app
 
@@ -11,10 +11,10 @@ COPY src ./src
 RUN mvn clean package
 
 # Stage 2: Create the Keycloak image with the SPI
-FROM quay.io/keycloak/keycloak:24.0.1
+FROM quay.io/keycloak/keycloak:26.4.5
 
 # Copy the JAR from the builder stage to the providers directory
-COPY --from=builder /app/target/keycloak-min-password-age-spi-1.0.0-SNAPSHOT.jar /opt/keycloak/providers/
+COPY --from=builder /app/target/keycloak-min-password-age-spi-*.jar /opt/keycloak/providers/
 
 # Run the build command to register the provider
 RUN /opt/keycloak/bin/kc.sh build

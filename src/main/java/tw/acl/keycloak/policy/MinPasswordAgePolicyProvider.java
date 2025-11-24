@@ -5,6 +5,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.policy.PasswordPolicyConfigException;
 import org.keycloak.policy.PasswordPolicyProvider;
 import org.keycloak.policy.PolicyError;
 
@@ -32,8 +33,8 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
         }
 
         // 2. Temporary Password / Required Action Bypass
-        if (user.getRequiredActionsStream().anyMatch(action -> "UPDATE_PASSWORD".equals(action))) {
-             return null;
+        if (user.getRequiredActionsStream().anyMatch("UPDATE_PASSWORD"::equals)) {
+            return null;
         }
 
         // 3. Get Configuration (Seconds as Long)
@@ -45,8 +46,8 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
         } else if (config instanceof Integer) {
             minAgeSeconds = ((Integer) config).longValue();
         } else if (config instanceof String) {
-             // Fallback if for some reason it wasn't parsed or is raw string
-             minAgeSeconds = parseConfig((String) config);
+            // Fallback if for some reason it wasn't parsed or is raw string
+            minAgeSeconds = parseConfig((String) config);
         }
 
         if (minAgeSeconds <= 0) {
@@ -64,22 +65,27 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
                     long minAgeMillis = TimeUnit.SECONDS.toMillis(finalMinAgeSeconds);
 
                     if (ageMillis < minAgeMillis) {
-                        long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(minAgeMillis - ageMillis);
-                        String timeWait;
-                        if (secondsLeft > 86400) {
-                             timeWait = (secondsLeft / 86400) + " day(s)";
-                        } else if (secondsLeft > 3600) {
-                             timeWait = (secondsLeft / 3600) + " hour(s)";
-                        } else if (secondsLeft > 60) {
-                             timeWait = (secondsLeft / 60) + " minute(s)";
-                        } else {
-                             timeWait = secondsLeft + " second(s)";
-                        }
+                        String timeWait = getTimeString(minAgeMillis, ageMillis);
                         return new PolicyError("Password cannot be changed yet. Please wait " + timeWait + ".", "minPasswordAgeNotReached", timeWait);
                     }
                     return null;
                 })
                 .orElse(null);
+    }
+
+    private static String getTimeString(long minAgeMillis, long ageMillis) {
+        long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(minAgeMillis - ageMillis);
+        String timeWait;
+        if (secondsLeft > 86400) {
+            timeWait = (secondsLeft / 86400) + " day(s)";
+        } else if (secondsLeft > 3600) {
+            timeWait = (secondsLeft / 3600) + " hour(s)";
+        } else if (secondsLeft > 60) {
+            timeWait = (secondsLeft / 60) + " minute(s)";
+        } else {
+            timeWait = secondsLeft + " second(s)";
+        }
+        return timeWait;
     }
 
     @Override
@@ -92,42 +98,38 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
         if (value == null || value.trim().isEmpty()) {
             return 0L;
         }
-        
+
         String normalized = value.trim().toLowerCase();
-        
+
         // Identify unit
         long multiplier = 1;
         String numberPart = normalized;
-        
+
         if (normalized.contains(":")) {
             String[] parts = normalized.split(":");
             if (parts.length == 2) {
                 numberPart = parts[0].trim();
                 String unit = parts[1].trim();
-                switch (unit) {
-                    case "d": multiplier = 86400; break;
-                    case "h": multiplier = 3600; break;
-                    case "m": multiplier = 60; break;
-                    case "s": multiplier = 1; break;
-                    default: 
-                        logger.warnv("Invalid unit ''{0}'' in Minimum Password Age policy. Defaulting to seconds.", unit);
-                        multiplier = 1; 
-                }
+                multiplier = switch (unit) {
+                    case "d" -> 86400;
+                    case "h" -> 3600;
+                    case "m" -> 60;
+                    case "s" -> 1;
+                    default -> throw new PasswordPolicyConfigException("Invalid unit in Minimum Password Age policy: " + unit);
+                };
             } else {
-                 logger.warnv("Invalid format ''{0}'' in Minimum Password Age policy. Expected 'value:unit'. Defaulting to seconds.", value);
+                throw new PasswordPolicyConfigException("Invalid format. Expected 'value:unit'.");
             }
         }
 
         try {
             long number = Long.parseLong(numberPart);
             if (number < 0) {
-                logger.warnv("Negative value ''{0}'' in Minimum Password Age policy. Treating as 0 (disabled).", number);
-                return 0L;
+                throw new PasswordPolicyConfigException("Negative value is not allowed in Minimum Password Age policy.");
             }
             return number * multiplier;
         } catch (NumberFormatException e) {
-            logger.warnv("Invalid number ''{0}'' in Minimum Password Age policy. Treating as 0 (disabled).", numberPart);
-            return 0L;
+            throw new PasswordPolicyConfigException("Invalid format. '" + numberPart + "' in Minimum Password Age policy.");
         }
     }
 

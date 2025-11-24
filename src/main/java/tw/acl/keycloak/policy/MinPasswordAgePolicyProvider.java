@@ -1,6 +1,5 @@
 package tw.acl.keycloak.policy;
 
-import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -14,8 +13,6 @@ import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
-
-    private static final Logger logger = Logger.getLogger(MinPasswordAgePolicyProvider.class);
     private final KeycloakSession session;
 
     public MinPasswordAgePolicyProvider(KeycloakSession session) {
@@ -39,7 +36,8 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
 
         // 3. Get Configuration (Seconds as Long)
         // Note: getPolicyConfig returns the object returned by parseConfig
-        Object config = session.getContext().getRealm().getPasswordPolicy().getPolicyConfig(MinPasswordAgePolicyProviderFactory.ID);
+        Object config = session.getContext().getRealm().getPasswordPolicy()
+                .getPolicyConfig(MinPasswordAgePolicyProviderFactory.ID);
         long minAgeSeconds = 0;
         if (config instanceof Long) {
             minAgeSeconds = (Long) config;
@@ -66,7 +64,8 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
 
                     if (ageMillis < minAgeMillis) {
                         String timeWait = getTimeString(minAgeMillis, ageMillis);
-                        return new PolicyError("Password cannot be changed yet. Please wait " + timeWait + ".", "minPasswordAgeNotReached", timeWait);
+                        return new PolicyError("Password cannot be changed yet. Please wait " + timeWait + ".",
+                                "minPasswordAgeNotReached", timeWait);
                     }
                     return null;
                 })
@@ -115,7 +114,8 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
                     case "h" -> 3600;
                     case "m" -> 60;
                     case "s" -> 1;
-                    default -> throw new PasswordPolicyConfigException("Invalid unit in Minimum Password Age policy: " + unit);
+                    default ->
+                        throw new PasswordPolicyConfigException("Invalid unit in Minimum Password Age policy: " + unit);
                 };
             } else {
                 throw new PasswordPolicyConfigException("Invalid format. Expected 'value:unit'.");
@@ -125,11 +125,13 @@ public class MinPasswordAgePolicyProvider implements PasswordPolicyProvider {
         try {
             long number = Long.parseLong(numberPart);
             if (number < 0) {
-                throw new PasswordPolicyConfigException("Negative value is not allowed in Minimum Password Age policy.");
+                throw new PasswordPolicyConfigException(
+                        "Negative value is not allowed in Minimum Password Age policy.");
             }
             return number * multiplier;
         } catch (NumberFormatException e) {
-            throw new PasswordPolicyConfigException("Invalid format. '" + numberPart + "' in Minimum Password Age policy.");
+            throw new PasswordPolicyConfigException(
+                    "Invalid format. '" + numberPart + "' in Minimum Password Age policy.");
         }
     }
 
